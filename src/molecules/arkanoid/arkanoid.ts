@@ -1,4 +1,4 @@
-import { Ball, Board } from "../../atoms";
+import { Ball, Board, Brick } from "../../atoms";
 import { BOARD_BOTTOM_GAP, CANVAS_BOTTOM_GAP } from "../../constants";
 import {
   BALL_RADIUS,
@@ -56,5 +56,12 @@ export class Arkanoid {
       clientWidth: this.width,
     });
     ball.render();
+
+    const brick = new Brick({
+      ctx: this.canvasCtx,
+      x: 10,
+      y: 10,
+    });
+    brick.render();
   }
 }
