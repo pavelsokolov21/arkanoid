@@ -5,6 +5,7 @@ import {
   DEFAULT_BOARD_HEIGHT,
   DEFAULT_BOARD_SPEED,
   DEFAULT_BOARD_WIDTH,
+  OFFSET_BOARD_X,
 } from "./board-constants";
 import { BoardProps } from "./board-interfaces";
 
@@ -15,6 +16,7 @@ export class Board extends Base {
   x: number;
   y: number;
   speed: number;
+  clientWidth: number;
 
   constructor({
     color = DEFAULT_BOARD_COLOR,
@@ -24,6 +26,7 @@ export class Board extends Base {
     x,
     y,
     ctx,
+    clientWidth,
   }: BoardProps) {
     super();
     this.width = width;
@@ -33,6 +36,7 @@ export class Board extends Base {
     this.y = y;
     this.ctx = ctx;
     this.speed = speed;
+    this.clientWidth = clientWidth;
   }
 
   reset() {
@@ -49,12 +53,24 @@ export class Board extends Base {
     document.addEventListener("keydown", (event) => {
       if (keycode.isEventKey(event, "left")) {
         this.reset();
-        this.x -= 10 * this.speed;
+        const newX = this.x - OFFSET_BOARD_X * this.speed;
+
+        if (newX <= 0) {
+          this.x = 0;
+        } else {
+          this.x = newX;
+        }
       }
 
       if (keycode.isEventKey(event, "right")) {
         this.reset();
-        this.x += 10 * this.speed;
+        const newX = this.x + OFFSET_BOARD_X * this.speed;
+
+        if (newX + this.width >= this.clientWidth) {
+          this.x = this.clientWidth - this.width;
+        } else {
+          this.x = newX;
+        }
       }
 
       this.update();
