@@ -1,5 +1,5 @@
 import keycode from "keycode";
-import { Base } from "../../atoms";
+import { COLORS } from "../../constants";
 import {
   DEFAULT_BOARD_COLOR,
   DEFAULT_BOARD_HEIGHT,
@@ -9,7 +9,7 @@ import {
 } from "./board-constants";
 import { BoardProps } from "./board-interfaces";
 
-export class Board extends Base {
+export class Board {
   width: number;
   height: number;
   fillColor: string;
@@ -17,6 +17,7 @@ export class Board extends Base {
   y: number;
   speed: number;
   clientWidth: number;
+  ctx: CanvasRenderingContext2D;
 
   constructor({
     color = DEFAULT_BOARD_COLOR,
@@ -28,7 +29,6 @@ export class Board extends Base {
     ctx,
     clientWidth,
   }: BoardProps) {
-    super();
     this.width = width;
     this.height = height;
     this.fillColor = color;
@@ -40,7 +40,7 @@ export class Board extends Base {
   }
 
   reset() {
-    this.ctx.fillStyle = "white";
+    this.ctx.fillStyle = COLORS.WHITE;
     this.ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
