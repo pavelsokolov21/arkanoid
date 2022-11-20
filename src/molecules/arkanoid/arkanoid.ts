@@ -1,6 +1,12 @@
 import { Ball, Board } from "../../atoms";
 import { BOARD_BOTTOM_GAP, CANVAS_BOTTOM_GAP } from "../../constants";
-import { BALL_RADIUS, BOARD_HEIGHT } from "./arkanoid-constants";
+import {
+  BALL_RADIUS,
+  BOARD_HEIGHT,
+  BOARD_SPEED,
+  BOARD_WIDTH,
+  OFFSET_BOARD_X,
+} from "./arkanoid-constants";
 import { ArkanoidProps } from "./arkanoid-interfaces";
 import { getYOfBall } from "./arkanoid-utils";
 
@@ -29,6 +35,9 @@ export class Arkanoid {
       ctx: this.canvasCtx,
       clientWidth: this.width,
       height: BOARD_HEIGHT,
+      width: BOARD_WIDTH,
+      speed: BOARD_SPEED,
+      offsetBoardX: OFFSET_BOARD_X,
     });
     board.render();
 
@@ -42,6 +51,9 @@ export class Arkanoid {
         ballRadius: BALL_RADIUS,
       }),
       radius: BALL_RADIUS,
+      isGameStarted: false,
+      offsetBoardX: OFFSET_BOARD_X,
+      clientWidth: this.width,
     });
     ball.render();
   }

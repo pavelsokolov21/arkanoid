@@ -9,4 +9,5 @@ export interface BoardProps {
   y: number;
   ctx: CanvasRenderingContext2D;
   clientWidth: number;
+  offsetBoardX?: number;
 }

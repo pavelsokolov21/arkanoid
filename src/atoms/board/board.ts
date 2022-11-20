@@ -5,18 +5,19 @@ import {
   DEFAULT_BOARD_HEIGHT,
   DEFAULT_BOARD_SPEED,
   DEFAULT_BOARD_WIDTH,
-  OFFSET_BOARD_X,
+  DEFAULT_OFFSET_BOARD_X,
 } from "./board-constants";
 import { BoardProps } from "./board-interfaces";
 
 export class Board {
   width: number;
   height: number;
-  fillColor: string;
+  fillColor: COLORS;
   x: number;
   y: number;
   speed: number;
   clientWidth: number;
+  offsetBoardX: number;
   ctx: CanvasRenderingContext2D;
 
   constructor({
@@ -24,6 +25,7 @@ export class Board {
     height = DEFAULT_BOARD_HEIGHT,
     width = DEFAULT_BOARD_WIDTH,
     speed = DEFAULT_BOARD_SPEED,
+    offsetBoardX = DEFAULT_OFFSET_BOARD_X,
     x,
     y,
     ctx,
@@ -37,6 +39,7 @@ export class Board {
     this.ctx = ctx;
     this.speed = speed;
     this.clientWidth = clientWidth;
+    this.offsetBoardX = offsetBoardX;
   }
 
   reset() {
@@ -53,7 +56,7 @@ export class Board {
     document.addEventListener("keydown", (event) => {
       if (keycode.isEventKey(event, "left")) {
         this.reset();
-        const newX = this.x - OFFSET_BOARD_X * this.speed;
+        const newX = this.x - this.offsetBoardX * this.speed;
 
         if (newX <= 0) {
           this.x = 0;
@@ -64,7 +67,7 @@ export class Board {
 
       if (keycode.isEventKey(event, "right")) {
         this.reset();
-        const newX = this.x + OFFSET_BOARD_X * this.speed;
+        const newX = this.x + this.offsetBoardX * this.speed;
 
         if (newX + this.width >= this.clientWidth) {
           this.x = this.clientWidth - this.width;
@@ -78,8 +81,7 @@ export class Board {
   }
 
   render() {
-    this.ctx.fillStyle = this.fillColor;
-    this.ctx.fillRect(this.x, this.y, this.width, this.height);
+    this.update();
 
     this.handleArrowKeypress();
   }
