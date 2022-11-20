@@ -4,4 +4,6 @@ export interface BoardProps {
   color?: string;
   x: number;
   y: number;
+  speed: number;
+  ctx: CanvasRenderingContext2D;
 }

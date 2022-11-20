@@ -31,8 +31,8 @@ class Arkanoid {
     canvas.width = this.width;
     canvas.height = this.height;
 
-    const board = new Board({ x: this.x, y: this.y });
-    board.render(this.canvasCtx);
+    const board = new Board({ x: this.x, y: this.y, ctx: this.canvasCtx });
+    board.render();
   }
 }
 

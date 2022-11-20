@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "@parcel/transformer-typescript-types": "^2.8.0",
+    "keycode": "^2.2.1",
     "typescript": "^4.9.3"
   }
 }
