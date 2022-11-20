@@ -1,0 +1,29 @@
+{
+  "name": "arkanoid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "source": "src/index.ts",
+  "scripts": {
+    "start": "parcel public/index.html",
+    "build": "parcel build src/index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pavelsokolov21/arkanoid.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pavelsokolov21/arkanoid/issues"
+  },
+  "homepage": "https://github.com/pavelsokolov21/arkanoid#readme",
+  "dependencies": {
+    "parcel": "^2.8.0"
+  },
+  "devDependencies": {
+    "@parcel/transformer-typescript-types": "^2.8.0",
+    "typescript": "^4.9.3"
+  }
+}
