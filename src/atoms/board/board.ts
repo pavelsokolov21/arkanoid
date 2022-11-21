@@ -1,5 +1,6 @@
 import keycode from "keycode";
 import { COLORS } from "../../constants";
+import { Position } from "../../interfaces";
 import {
   DEFAULT_BOARD_COLOR,
   DEFAULT_BOARD_HEIGHT,
@@ -50,6 +51,23 @@ export class Board {
   update() {
     this.ctx.fillStyle = this.fillColor;
     this.ctx.fillRect(this.x, this.y, this.width, this.height);
+  }
+
+  getPositions() {
+    const topLeft: Position = {
+      x: this.x,
+      y: this.y,
+    };
+
+    const topRight = {
+      x: this.x + this.width,
+      y: this.y,
+    };
+
+    return {
+      topLeft,
+      topRight,
+    };
   }
 
   handleArrowKeypress() {

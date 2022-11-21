@@ -5,7 +5,6 @@ import {
   CANVAS_BOTTOM_GAP,
   GAME_STATUSES,
 } from "../../constants";
-import { Position } from "../../interfaces";
 import {
   BALL_DIRECTIONS_X,
   BALL_DIRECTION_Y,
@@ -37,6 +36,8 @@ export class Arkanoid {
   gameStatus: GAME_STATUSES;
   bricks: Bricks;
   ballDirections: BallDirections;
+  board: Board | null;
+  ball: Ball | null;
 
   constructor({ canvas }: ArkanoidProps) {
     this.width = document.body.clientWidth;
@@ -49,6 +50,7 @@ export class Arkanoid {
       x: BALL_DIRECTIONS_X.NONE,
       y: BALL_DIRECTION_Y.TOP,
     };
+    this.board = null;
   }
 
   renderBricks(rows: number = DEFAULT_BRICKS_ROWS) {
@@ -90,24 +92,26 @@ export class Arkanoid {
     });
   }
 
-  start(ball: Ball) {
+  start() {
     document.addEventListener("keypress", (event) => {
       if (
         keycode.isEventKey(event, "space") &&
         this.gameStatus !== GAME_STATUSES.PROCESSING
       ) {
         this.gameStatus = GAME_STATUSES.PROCESSING;
-        ball.changeGameStatus(true);
+        this.ball!.changeGameStatus(true);
 
-        for (let i = 1; i <= 300; i++) {
+        for (let i = 1; i <= 6000; i++) {
           setTimeout(() => {
-            ball.changePosition({
+            this.ball!.changePosition({
               y: this.ballDirections.y === BALL_DIRECTION_Y.TOP ? 1 : -1,
               x: 0,
             });
 
-            const ballPositions = ball.getPositionsByRadius();
+            const ballPositions = this.ball!.getPositionsByRadius();
+            const boardPosition = this.board!.getPositions();
 
+            // Checking bricks
             this.bricks.map((row) =>
               row.map((brick) => {
                 if (brick.getIsBroken()) {
@@ -116,7 +120,7 @@ export class Arkanoid {
 
                 const brickPositions = brick.getPositions();
 
-                // top ball to bottom brick
+                // top of ball to bottom of brick
                 if (
                   ballPositions.top.y <= brickPositions.leftBottom.y &&
                   ballPositions.top.x >= brickPositions.leftBottom.x &&
@@ -129,16 +133,22 @@ export class Arkanoid {
                 return brick;
               })
             );
+
+            // Checking board
+            if (
+              boardPosition.topLeft.x < ballPositions.bottom.x &&
+              boardPosition.topRight.x > ballPositions.bottom.x &&
+              boardPosition.topLeft.y <= ballPositions.bottom.y
+            ) {
+              this.ballDirections.y = BALL_DIRECTION_Y.TOP;
+            }
           }, 10 * i);
         }
       }
     });
   }
 
-  render() {
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-
+  renderBoard() {
     const board = new Board({
       x: Math.floor(this.width / 2),
       y: this.height - BOARD_BOTTOM_GAP,
@@ -151,6 +161,10 @@ export class Arkanoid {
     });
     board.render();
 
+    this.board = board;
+  }
+
+  renderBall() {
     const ball = new Ball({
       ctx: this.canvasCtx,
       x: Math.floor(this.width / 2),
@@ -167,8 +181,17 @@ export class Arkanoid {
     });
     ball.render();
 
+    this.ball = ball;
+  }
+
+  render() {
+    this.canvas.width = this.width;
+    this.canvas.height = this.height;
+
+    this.renderBoard();
+    this.renderBall();
     this.renderBricks();
 
-    this.start(ball);
+    this.start();
   }
 }

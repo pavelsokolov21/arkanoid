@@ -100,6 +100,8 @@ export class Ball {
     this.reset();
 
     this.y -= y * this.moveSpeed;
+    this.x += x * this.moveSpeed;
+
     this.update();
   }
 
