@@ -1,5 +1,5 @@
 import keycode from "keycode";
-import { Ball, Board, Brick } from "../../atoms";
+import { Ball, BallPositions, Board, Brick, BrickPositions } from "../../atoms";
 import {
   BOARD_BOTTOM_GAP,
   CANVAS_BOTTOM_GAP,
@@ -23,6 +23,7 @@ import {
   BallDirections,
   Bricks,
   BrickStatus,
+  PositionsOfElements,
 } from "./arkanoid-interfaces";
 import { getYOfBall } from "./arkanoid-utils";
 
@@ -94,18 +95,98 @@ export class Arkanoid {
 
   getXDirection() {
     if (this.ballDirections.x === BALL_DIRECTIONS_X.NONE) {
-      return 1;
+      return 3;
     }
 
     return this.ballDirections.x === BALL_DIRECTIONS_X.LEFT ? -1 : 1;
   }
 
+  checkBallBrickBouncing({
+    ballPositions,
+    brickPositions,
+    brick,
+  }: Omit<PositionsOfElements, "boardPosition"> & { brick: Brick }) {
+    // top of ball to bottom of brick
+    if (
+      ballPositions.top.y <= brickPositions.leftBottom.y &&
+      ballPositions.bottom.y >= brickPositions.leftBottom.y &&
+      ballPositions.top.x >= brickPositions.leftBottom.x &&
+      ballPositions.top.x <= brickPositions.rightBottom.x
+    ) {
+      brick.break();
+      this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
+    }
+
+    // bottom of ball to top of brick
+    if (
+      ballPositions.bottom.y >= brickPositions.leftTop.y &&
+      ballPositions.top.y <= brickPositions.leftTop.y &&
+      ballPositions.bottom.x >= brickPositions.leftTop.x &&
+      ballPositions.bottom.x <= brickPositions.rightTop.x
+    ) {
+      brick.break();
+      this.ballDirections.y = BALL_DIRECTION_Y.TOP;
+    }
+
+    // left of ball to right of brick
+    if (
+      ballPositions.left.x <= brickPositions.rightBottom.x &&
+      ballPositions.right.x >= brickPositions.rightBottom.x &&
+      ballPositions.left.y >= brickPositions.rightTop.y &&
+      ballPositions.left.y <= brickPositions.rightBottom.y
+    ) {
+      brick.break();
+      this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
+    }
+
+    // right of ball to left of brick
+    if (
+      ballPositions.right.x >= brickPositions.leftBottom.x &&
+      ballPositions.left.x <= brickPositions.leftBottom.x &&
+      ballPositions.right.y >= brickPositions.leftTop.y &&
+      ballPositions.right.y <= brickPositions.leftBottom.y
+    ) {
+      brick.break();
+      this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
+    }
+  }
+
+  checkBoard({
+    ballPositions,
+    boardPosition,
+  }: Omit<PositionsOfElements, "brickPositions">) {
+    if (
+      boardPosition.topLeft.x < ballPositions.bottom.x &&
+      boardPosition.topRight.x > ballPositions.bottom.x &&
+      boardPosition.topLeft.y <= ballPositions.bottom.y
+    ) {
+      this.ballDirections.y = BALL_DIRECTION_Y.TOP;
+    }
+  }
+
+  checkBouncingBallOfBorders({
+    ballPositions,
+  }: Pick<PositionsOfElements, "ballPositions">) {
+    if (ballPositions.right.x >= this.width) {
+      this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
+    }
+
+    if (ballPositions.left.x <= 0) {
+      this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
+    }
+
+    if (ballPositions.top.y <= 0) {
+      this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
+    }
+  }
+
   start() {
     document.addEventListener("keypress", (event) => {
-      if (
-        keycode.isEventKey(event, "space") &&
-        this.gameStatus !== GAME_STATUSES.PROCESSING
-      ) {
+      if (keycode.isEventKey(event, "space")) {
+        if (this.gameStatus === GAME_STATUSES.PROCESSING) {
+          return;
+        }
+
         this.gameStatus = GAME_STATUSES.PROCESSING;
         this.ball!.changeGameStatus(true);
 
@@ -128,75 +209,18 @@ export class Arkanoid {
 
                 const brickPositions = brick.getPositions();
 
-                // top of ball to bottom of brick
-                if (
-                  ballPositions.top.y <= brickPositions.leftBottom.y &&
-                  ballPositions.bottom.y >= brickPositions.leftBottom.y &&
-                  ballPositions.top.x >= brickPositions.leftBottom.x &&
-                  ballPositions.top.x <= brickPositions.rightBottom.x
-                ) {
-                  brick.break();
-                  this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
-                }
-
-                // bottom of ball to top of brick
-                if (
-                  ballPositions.bottom.y >= brickPositions.leftTop.y &&
-                  ballPositions.top.y <= brickPositions.leftTop.y &&
-                  ballPositions.bottom.x >= brickPositions.leftTop.x &&
-                  ballPositions.bottom.x <= brickPositions.rightTop.x
-                ) {
-                  brick.break();
-                  this.ballDirections.y = BALL_DIRECTION_Y.TOP;
-                }
-
-                // left of ball to right of brick
-                if (
-                  ballPositions.left.x <= brickPositions.rightBottom.x &&
-                  ballPositions.right.x >= brickPositions.rightBottom.x &&
-                  ballPositions.left.y >= brickPositions.rightTop.y &&
-                  ballPositions.left.y <= brickPositions.rightBottom.y
-                ) {
-                  brick.break();
-                  this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
-                }
-
-                // right of ball to left of brick
-                if (
-                  ballPositions.right.x >= brickPositions.leftBottom.x &&
-                  ballPositions.left.x <= brickPositions.leftBottom.x &&
-                  ballPositions.right.y >= brickPositions.leftTop.y &&
-                  ballPositions.right.y <= brickPositions.leftBottom.y
-                ) {
-                  brick.break();
-                  this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
-                }
+                this.checkBallBrickBouncing({
+                  brickPositions,
+                  ballPositions,
+                  brick,
+                });
 
                 return brick;
               })
             );
 
-            // Checking board
-            if (
-              boardPosition.topLeft.x < ballPositions.bottom.x &&
-              boardPosition.topRight.x > ballPositions.bottom.x &&
-              boardPosition.topLeft.y <= ballPositions.bottom.y
-            ) {
-              this.ballDirections.y = BALL_DIRECTION_Y.TOP;
-            }
-
-            // Checking boundaries of borders
-            if (ballPositions.right.x >= this.width) {
-              this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
-            }
-
-            if (ballPositions.left.x <= 0) {
-              this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
-            }
-
-            if (ballPositions.top.y <= 0) {
-              this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
-            }
+            this.checkBoard({ ballPositions, boardPosition });
+            this.checkBouncingBallOfBorders({ ballPositions });
           }, 10 * i);
         }
       }

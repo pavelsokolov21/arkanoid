@@ -1,7 +1,7 @@
 import { COLORS } from "../../constants";
 import { Position } from "../../interfaces";
 import { DEFAULT_BRICK_HEIGHT, DEFAULT_BRICK_WIDTH } from "./brick-constants";
-import { BrickProps } from "./brick-interfaces";
+import { BrickPositions, BrickProps } from "./brick-interfaces";
 
 export class Brick {
   width: number;
@@ -29,7 +29,7 @@ export class Brick {
     this.isBroken = false;
   }
 
-  getPositions() {
+  getPositions(): BrickPositions {
     const leftTop: Position = {
       x: this.x,
       y: this.y,

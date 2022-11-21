@@ -1,4 +1,5 @@
 import { COLORS } from "../../constants";
+import { Position } from "../../interfaces";
 
 export interface BoardProps {
   width?: number;
@@ -10,4 +11,9 @@ export interface BoardProps {
   ctx: CanvasRenderingContext2D;
   clientWidth: number;
   offsetBoardX?: number;
+}
+
+export interface BoardPositions {
+  topLeft: Position;
+  topRight: Position;
 }

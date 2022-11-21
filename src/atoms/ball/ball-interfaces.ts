@@ -1,4 +1,5 @@
 import { COLORS } from "../../constants";
+import { Position } from "../../interfaces";
 
 export interface BallProps {
   radius?: number;
@@ -11,4 +12,11 @@ export interface BallProps {
   isGameStarted: boolean;
   offsetBoardX: number;
   clientWidth: number;
+}
+
+export interface BallPositions {
+  top: Position;
+  right: Position;
+  bottom: Position;
+  left: Position;
 }

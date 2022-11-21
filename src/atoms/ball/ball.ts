@@ -7,7 +7,7 @@ import {
   DEFAULT_BALL_RADIUS,
   DEFAULT_SPEED_WITH_BOARD,
 } from "./ball-constants";
-import { BallProps } from "./ball-interfaces";
+import { BallPositions, BallProps } from "./ball-interfaces";
 
 export class Ball {
   radius: number;
@@ -109,7 +109,7 @@ export class Ball {
     this.isGameStarted = status;
   }
 
-  getPositionsByRadius() {
+  getPositionsByRadius(): BallPositions {
     const top: Position = {
       x: this.x,
       y: this.y - this.radius,

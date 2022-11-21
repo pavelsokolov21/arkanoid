@@ -8,7 +8,7 @@ import {
   DEFAULT_BOARD_WIDTH,
   DEFAULT_OFFSET_BOARD_X,
 } from "./board-constants";
-import { BoardProps } from "./board-interfaces";
+import { BoardPositions, BoardProps } from "./board-interfaces";
 
 export class Board {
   width: number;
@@ -53,13 +53,13 @@ export class Board {
     this.ctx.fillRect(this.x, this.y, this.width, this.height);
   }
 
-  getPositions() {
+  getPositions(): BoardPositions {
     const topLeft: Position = {
       x: this.x,
       y: this.y,
     };
 
-    const topRight = {
+    const topRight: Position = {
       x: this.x + this.width,
       y: this.y,
     };
