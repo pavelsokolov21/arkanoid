@@ -1,5 +1,5 @@
 import keycode from "keycode";
-import { Ball, BallPositions, Board, Brick, BrickPositions } from "../../atoms";
+import { Ball, Board, Brick } from "../../atoms";
 import {
   BOARD_BOTTOM_GAP,
   CANVAS_BOTTOM_GAP,
@@ -24,6 +24,7 @@ import {
   Bricks,
   BrickStatus,
   PositionsOfElements,
+  XRatios,
 } from "./arkanoid-interfaces";
 import { getYOfBall } from "./arkanoid-utils";
 
@@ -39,6 +40,7 @@ export class Arkanoid {
   ballDirections: BallDirections;
   board: Board | null;
   ball: Ball | null;
+  xRatio: XRatios;
 
   constructor({ canvas }: ArkanoidProps) {
     this.width = document.body.clientWidth;
@@ -52,6 +54,7 @@ export class Arkanoid {
       y: BALL_DIRECTION_Y.TOP,
     };
     this.board = null;
+    this.xRatio = 1;
   }
 
   renderBricks(rows: number = DEFAULT_BRICKS_ROWS) {
@@ -93,19 +96,13 @@ export class Arkanoid {
     });
   }
 
-  getXDirection() {
-    if (this.ballDirections.x === BALL_DIRECTIONS_X.NONE) {
-      return 3;
-    }
-
-    return this.ballDirections.x === BALL_DIRECTIONS_X.LEFT ? -1 : 1;
-  }
-
   checkBallBrickBouncing({
     ballPositions,
     brickPositions,
     brick,
-  }: Omit<PositionsOfElements, "boardPosition"> & { brick: Brick }) {
+  }: Omit<PositionsOfElements, "boardPosition" | "subBoardsPositions"> & {
+    brick: Brick;
+  }) {
     // top of ball to bottom of brick
     if (
       ballPositions.top.y <= brickPositions.leftBottom.y &&
@@ -151,9 +148,20 @@ export class Arkanoid {
     }
   }
 
-  checkBoard({
+  getXPosition() {
+    if (this.ballDirections.x === BALL_DIRECTIONS_X.NONE) {
+      return 0;
+    }
+
+    const ratio = this.ballDirections.x === BALL_DIRECTIONS_X.LEFT ? -1 : 1;
+
+    return this.xRatio * ratio;
+  }
+
+  checkBouncingBallFromBoard({
     ballPositions,
     boardPosition,
+    subBoardsPositions,
   }: Omit<PositionsOfElements, "brickPositions">) {
     if (
       boardPosition.topLeft.x < ballPositions.bottom.x &&
@@ -162,9 +170,34 @@ export class Arkanoid {
     ) {
       this.ballDirections.y = BALL_DIRECTION_Y.TOP;
     }
+
+    // checking subboard positions
+    subBoardsPositions.forEach((position, index) => {
+      if (
+        position.topLeft.x <= ballPositions.bottom.x &&
+        position.topRight.x >= ballPositions.bottom.x &&
+        position.topLeft.y <= ballPositions.bottom.y
+      ) {
+        if (index === 0 || index === 3) {
+          this.xRatio = 1;
+        }
+
+        if (index === 1 || index === 2) {
+          this.xRatio = 0.5;
+        }
+
+        if (index === 0 || index === 1) {
+          this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
+        }
+
+        if (index === 2 || index === 3) {
+          this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
+        }
+      }
+    });
   }
 
-  checkBouncingBallOfBorders({
+  checkBouncingBallFromBorders({
     ballPositions,
   }: Pick<PositionsOfElements, "ballPositions">) {
     if (ballPositions.right.x >= this.width) {
@@ -189,16 +222,16 @@ export class Arkanoid {
 
         this.gameStatus = GAME_STATUSES.PROCESSING;
         this.ball!.changeGameStatus(true);
-
         for (let i = 1; i <= 10_000; i++) {
           setTimeout(() => {
             this.ball!.changePosition({
               y: this.ballDirections.y === BALL_DIRECTION_Y.TOP ? 1 : -1,
-              x: this.getXDirection(),
+              x: this.getXPosition(),
             });
 
             const ballPositions = this.ball!.getPositionsByRadius();
             const boardPosition = this.board!.getPositions();
+            const subBoardsPositions = this.board!.getSubBoardsPositions();
 
             // Checking bricks
             this.bricks.map((row) =>
@@ -219,8 +252,12 @@ export class Arkanoid {
               })
             );
 
-            this.checkBoard({ ballPositions, boardPosition });
-            this.checkBouncingBallOfBorders({ ballPositions });
+            this.checkBouncingBallFromBoard({
+              ballPositions,
+              boardPosition,
+              subBoardsPositions,
+            });
+            this.checkBouncingBallFromBorders({ ballPositions });
           }, 10 * i);
         }
       }

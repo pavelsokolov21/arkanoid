@@ -5,3 +5,4 @@ export const DEFAULT_BOARD_HEIGHT = 10;
 export const DEFAULT_BOARD_COLOR = COLORS.BLACK;
 export const DEFAULT_BOARD_SPEED = 2;
 export const DEFAULT_OFFSET_BOARD_X = 12;
+export const DEFAULT_COUNT_OF_SUB_BOARDS = 4;

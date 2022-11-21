@@ -6,6 +6,7 @@ import {
   DEFAULT_BOARD_HEIGHT,
   DEFAULT_BOARD_SPEED,
   DEFAULT_BOARD_WIDTH,
+  DEFAULT_COUNT_OF_SUB_BOARDS,
   DEFAULT_OFFSET_BOARD_X,
 } from "./board-constants";
 import { BoardPositions, BoardProps } from "./board-interfaces";
@@ -68,6 +69,29 @@ export class Board {
       topLeft,
       topRight,
     };
+  }
+
+  getSubBoardsPositions(
+    countOfSubBoards: number = DEFAULT_COUNT_OF_SUB_BOARDS
+  ): BoardPositions[] {
+    const widthOfOneSubBoard = this.width / countOfSubBoards;
+    const subBoardsPositions = new Array(countOfSubBoards)
+      .fill(0)
+      .map((_, index) => {
+        const topLeft: Position = {
+          x: this.x + index * widthOfOneSubBoard,
+          y: this.y,
+        };
+
+        const topRight: Position = {
+          x: this.x + index * widthOfOneSubBoard + widthOfOneSubBoard,
+          y: this.y,
+        };
+
+        return { topLeft, topRight };
+      });
+
+    return subBoardsPositions;
   }
 
   handleArrowKeypress() {

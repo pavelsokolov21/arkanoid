@@ -28,6 +28,9 @@ export interface PositionsOfElements {
   ballPositions: BallPositions;
   brickPositions: BrickPositions;
   boardPosition: BoardPositions;
+  subBoardsPositions: BoardPositions[];
 }
 
 export type Bricks = Array<Brick[]>;
+
+export type XRatios = 0 | 0.5 | 1 | -0.5 | -1;
