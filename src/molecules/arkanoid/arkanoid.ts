@@ -5,9 +5,13 @@ import {
   BOARD_HEIGHT,
   BOARD_SPEED,
   BOARD_WIDTH,
+  BRICK_GAP,
+  BRICK_HEIGHT,
+  BRICK_WIDTH,
+  DEFAULT_BRICKS_ROWS,
   OFFSET_BOARD_X,
 } from "./arkanoid-constants";
-import { ArkanoidProps } from "./arkanoid-interfaces";
+import { ArkanoidProps, BrickRow } from "./arkanoid-interfaces";
 import { getYOfBall } from "./arkanoid-utils";
 
 export class Arkanoid {
@@ -23,6 +27,39 @@ export class Arkanoid {
     this.height = document.body.clientHeight - CANVAS_BOTTOM_GAP;
     this.canvas = canvas;
     this.canvasCtx = canvas.getContext("2d")!;
+  }
+
+  renderBricks(rows: number = DEFAULT_BRICKS_ROWS) {
+    const bricks: BrickRow = [];
+
+    for (let i = 0; i < rows; i++) {
+      const countOfBricksInRow = Math.floor(
+        this.width / (BRICK_GAP * 2 + BRICK_WIDTH)
+      );
+      const row = new Array(countOfBricksInRow).fill(1);
+
+      bricks.push(row);
+    }
+
+    // Поменять логику на кол-во кирпичей в строке
+    // вместо измерения кол-ва по ширине экрана
+    bricks.forEach((row, rowIndex) => {
+      row.forEach((_, brickIndex) => {
+        const breakXPosition = brickIndex * (BRICK_GAP + BRICK_WIDTH);
+        const breakYPosition =
+          (rowIndex + 0.5) * (BRICK_GAP * 2 + BRICK_HEIGHT);
+
+        const brick = new Brick({
+          ctx: this.canvasCtx,
+          width: BRICK_WIDTH,
+          height: BRICK_HEIGHT,
+          x: breakXPosition,
+          y: breakYPosition,
+        });
+
+        brick.render();
+      });
+    });
   }
 
   render() {
@@ -57,11 +94,6 @@ export class Arkanoid {
     });
     ball.render();
 
-    const brick = new Brick({
-      ctx: this.canvasCtx,
-      x: 10,
-      y: 10,
-    });
-    brick.render();
+    this.renderBricks();
   }
 }
