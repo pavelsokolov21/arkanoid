@@ -1,5 +1,4 @@
 import { COLORS } from "../../constants";
-import { Position } from "../../interfaces";
 
 export interface BallProps {
   radius?: number;

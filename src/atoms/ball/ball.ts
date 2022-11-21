@@ -96,6 +96,43 @@ export class Ball {
     });
   }
 
+  changePosition({ x, y }: Position) {
+    this.reset();
+
+    this.y -= y * this.moveSpeed;
+    this.update();
+  }
+
+  changeGameStatus(status: boolean) {
+    this.isGameStarted = status;
+  }
+
+  getPositionsByRadius() {
+    const top: Position = {
+      x: this.x,
+      y: this.y - this.radius,
+    };
+    const right: Position = {
+      x: this.x + this.radius,
+      y: this.y,
+    };
+    const bottom: Position = {
+      x: this.x,
+      y: this.y + this.radius,
+    };
+    const left: Position = {
+      x: this.x - this.radius,
+      y: this.y,
+    };
+
+    return {
+      top,
+      right,
+      bottom,
+      left,
+    };
+  }
+
   render() {
     this.update();
 

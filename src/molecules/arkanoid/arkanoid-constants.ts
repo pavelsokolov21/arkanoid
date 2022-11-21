@@ -9,3 +9,14 @@ export const BRICK_WIDTH = 92;
 export const BRICK_HEIGHT = 25;
 export const BRICK_GAP = 3;
 export const DEFAULT_BRICKS_ROWS = 4;
+
+export enum BALL_DIRECTIONS_X {
+  LEFT = "LEFT",
+  RIGHT = "RIGHT",
+  NONE = "NONE",
+}
+
+export enum BALL_DIRECTION_Y {
+  TOP = "TOP",
+  BOTTOM = "BOTTOM",
+}
