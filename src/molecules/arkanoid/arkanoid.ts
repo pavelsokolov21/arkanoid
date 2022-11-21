@@ -109,7 +109,7 @@ export class Arkanoid {
         this.gameStatus = GAME_STATUSES.PROCESSING;
         this.ball!.changeGameStatus(true);
 
-        for (let i = 1; i <= 6000; i++) {
+        for (let i = 1; i <= 10_000; i++) {
           setTimeout(() => {
             this.ball!.changePosition({
               y: this.ballDirections.y === BALL_DIRECTION_Y.TOP ? 1 : -1,
@@ -131,11 +131,45 @@ export class Arkanoid {
                 // top of ball to bottom of brick
                 if (
                   ballPositions.top.y <= brickPositions.leftBottom.y &&
+                  ballPositions.bottom.y >= brickPositions.leftBottom.y &&
                   ballPositions.top.x >= brickPositions.leftBottom.x &&
                   ballPositions.top.x <= brickPositions.rightBottom.x
                 ) {
                   brick.break();
                   this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
+                }
+
+                // bottom of ball to top of brick
+                if (
+                  ballPositions.bottom.y >= brickPositions.leftTop.y &&
+                  ballPositions.top.y <= brickPositions.leftTop.y &&
+                  ballPositions.bottom.x >= brickPositions.leftTop.x &&
+                  ballPositions.bottom.x <= brickPositions.rightTop.x
+                ) {
+                  brick.break();
+                  this.ballDirections.y = BALL_DIRECTION_Y.TOP;
+                }
+
+                // left of ball to right of brick
+                if (
+                  ballPositions.left.x <= brickPositions.rightBottom.x &&
+                  ballPositions.right.x >= brickPositions.rightBottom.x &&
+                  ballPositions.left.y >= brickPositions.rightTop.y &&
+                  ballPositions.left.y <= brickPositions.rightBottom.y
+                ) {
+                  brick.break();
+                  this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
+                }
+
+                // right of ball to left of brick
+                if (
+                  ballPositions.right.x >= brickPositions.leftBottom.x &&
+                  ballPositions.left.x <= brickPositions.leftBottom.x &&
+                  ballPositions.right.y >= brickPositions.leftTop.y &&
+                  ballPositions.right.y <= brickPositions.leftBottom.y
+                ) {
+                  brick.break();
+                  this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
                 }
 
                 return brick;
@@ -151,13 +185,17 @@ export class Arkanoid {
               this.ballDirections.y = BALL_DIRECTION_Y.TOP;
             }
 
-            // Checking boundaries
+            // Checking boundaries of borders
             if (ballPositions.right.x >= this.width) {
               this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
             }
 
             if (ballPositions.left.x <= 0) {
               this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
+            }
+
+            if (ballPositions.top.y <= 0) {
+              this.ballDirections.y = BALL_DIRECTION_Y.BOTTOM;
             }
           }, 10 * i);
         }
