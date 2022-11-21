@@ -92,6 +92,14 @@ export class Arkanoid {
     });
   }
 
+  getXDirection() {
+    if (this.ballDirections.x === BALL_DIRECTIONS_X.NONE) {
+      return 1;
+    }
+
+    return this.ballDirections.x === BALL_DIRECTIONS_X.LEFT ? -1 : 1;
+  }
+
   start() {
     document.addEventListener("keypress", (event) => {
       if (
@@ -105,7 +113,7 @@ export class Arkanoid {
           setTimeout(() => {
             this.ball!.changePosition({
               y: this.ballDirections.y === BALL_DIRECTION_Y.TOP ? 1 : -1,
-              x: 0,
+              x: this.getXDirection(),
             });
 
             const ballPositions = this.ball!.getPositionsByRadius();
@@ -141,6 +149,15 @@ export class Arkanoid {
               boardPosition.topLeft.y <= ballPositions.bottom.y
             ) {
               this.ballDirections.y = BALL_DIRECTION_Y.TOP;
+            }
+
+            // Checking boundaries
+            if (ballPositions.right.x >= this.width) {
+              this.ballDirections.x = BALL_DIRECTIONS_X.LEFT;
+            }
+
+            if (ballPositions.left.x <= 0) {
+              this.ballDirections.x = BALL_DIRECTIONS_X.RIGHT;
             }
           }, 10 * i);
         }
@@ -178,6 +195,7 @@ export class Arkanoid {
       isGameStarted: this.gameStatus === GAME_STATUSES.PROCESSING,
       offsetBoardX: OFFSET_BOARD_X,
       clientWidth: this.width,
+      speedWithBoard: BOARD_SPEED,
     });
     ball.render();
 
